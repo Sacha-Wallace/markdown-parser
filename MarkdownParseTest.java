@@ -3,7 +3,10 @@ import org.junit.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.*;
+import java.util.Map;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MarkdownParseTest {
@@ -63,5 +66,49 @@ public class MarkdownParseTest {
         List<String> expect = List.of("https://something.com", "some-page.html");
         assertEquals(MarkdownParse.getLinks(contents), expect);
     }
+
+    @Test
+    public void Snippet1Contains2Links() throws IOException {
+        String snippet = Files.readString(Path.of("./test-file9.md"));
+        //`[a link`] and [another link] -- 2 expected
+        assertEquals(MarkdownParse.getLinks(snippet).size(), 2);
+    }
+
+    @Test
+    public void Snippet2HasParentheses() throws IOException{
+        boolean expected = true;
+        boolean result;
+        String snippet = Files.readString(Path.of("./test-file10.md"));
+        for(String cutSnippet: MarkdownParse.getLinks(snippet)){
+            if(cutSnippet.contains("(())")){
+                result = true;
+            }
+            else{
+                result = false;
+            }
+            assertEquals(expected, result);
+            return;
+        } 
+        
+        
+    }
+
+    @Test
+    public void Snippet3LineBreakisLink() throws IOException{
+        String snippet = Files.readString(Path.of("./test-file11.md"));
+        boolean expected = true;
+        boolean result;
+        String givenLinkTitle = MarkdownParse.getLinks(snippet).get(0);
+        String expectedLinkTitle = "this title text is really long and takes up more than \none line\n\nand has some line breaks";
+
+        if(givenLinkTitle.equals(expectedLinkTitle)){
+            result = true;
+        }
+        else{
+            result = false; 
+        }
+        assertEquals(expected, result);
+    }
+    
     
 }
